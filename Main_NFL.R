@@ -22,8 +22,8 @@ run_optimizer <- TRUE  # Set to TRUE to run survivor optimizer
 
 # Initial survivor pool state
 survivor_state <- list(
-  used_teams = c("WAS"),
-  picked_weeks = c(1)
+  used_teams = c("WAS", "ARI"),
+  picked_weeks = c(1, 2)
 )
 
 # ---------------------------
@@ -79,15 +79,31 @@ if (run_optimizer) {
     cat("Recommended survivor picks:\n")
     print(solution)
     
-    # Update survivor state
-    survivor_state$used_teams  <- c(survivor_state$used_teams, solution$pick)
-    survivor_state$picked_weeks <- c(survivor_state$picked_weeks, solution$week)
+    # ---------------------------
+    # NEW: Save recommendations to CSV with appended date
+    # ---------------------------
+    solution_to_save <- solution %>%
+      mutate(
+        appended_date = as.Date(Sys.time()),
+        season = current_season   # track the season
+      )
+    
+    csv_file <- "survivor_picks.csv"
+    
+    if (file.exists(csv_file)) {
+      existing <- readr::read_csv(csv_file, show_col_types = FALSE)
+      
+      # Remove any rows for the same season & weeks
+      existing <- existing %>%
+        filter(!(.data$season == current_season & .data$week %in% solution_to_save$week))
+      
+      combined <- bind_rows(existing, solution_to_save)
+      readr::write_csv(combined, csv_file)
+    } else {
+      readr::write_csv(solution_to_save, csv_file)
+    }
   }
 }
-
-cat("Updated survivor state:\n")
-print(survivor_state)
-
 # ---------------------------
 # Step 4: Add division info & continuous game index
 # ---------------------------

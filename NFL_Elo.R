@@ -12,7 +12,7 @@ library(ROI.plugin.glpk)
 # Config
 # ---------------------------
 current_season <- 2025
-used_teams <- c()  # Teams already picked
+used_teams <- c("WAS")  # Teams already picked
 
 home_field_adv <- 55  # Elo points boost for home team
 base_k <- 20          # Base K-factor

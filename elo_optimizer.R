@@ -106,4 +106,25 @@ optimize_survivor_picks <- function(ratings, all_games, current_season,
     )
   
   return(solution)
+}
+
+# ---------------------------
+# Utility: Save survivor picks to CSV
+# ---------------------------
+save_survivor_picks <- function(picks, filepath = "survivor_picks.csv") {
+  if (nrow(picks) == 0) return(invisible(NULL))
+  
+  picks <- picks %>%
+    mutate(
+      recommended_at = Sys.time(),       # full timestamp
+      appended_date  = as.Date(Sys.time()) # date-only
+    )
+  
+  if (file.exists(filepath)) {
+    readr::write_csv(picks, filepath, append = TRUE, col_names = FALSE)
+  } else {
+    readr::write_csv(picks, filepath)
   }
+  
+  invisible(filepath)
+}
